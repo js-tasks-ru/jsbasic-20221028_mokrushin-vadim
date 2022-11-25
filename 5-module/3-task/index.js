@@ -8,10 +8,13 @@ function initCarousel() {
 
   const view = {
     position: 0,
-    inner: document.querySelector(".carousel__inner"),
-    length: document.querySelector(".carousel__inner").children.length,
+    innerBox: document.querySelector(".carousel__inner"),
     arrowLeft: document.querySelector(".carousel__arrow_left"),
     arrowRight: document.querySelector(".carousel__arrow_right"),
+
+    get carouselLength() {
+      return this.innerBox.children.length;
+    },
 
     switchLeft() {
       this.position--;
@@ -24,16 +27,20 @@ function initCarousel() {
     },
 
     update() {
-      this.inner.style.transform = `translateX(-${
-        this.position * this.inner.offsetWidth
+      this.innerBox.style.transform = `translateX(-${
+        this.position * this.innerBox.offsetWidth
       }px)`;
 
-      if (this.position > 0 && this.position < this.length) {
+      if (this.position > 0 && this.position < this.carouselLength - 1) {
         this.arrowLeft.style.display = "block";
         this.arrowRight.style.display = "block";
+        return;
       }
-      if (this.position === 0) this.arrowLeft.style.display = "none";
-      if (this.position === this.length - 1)
+      if (this.position === 0) {
+        this.arrowLeft.style.display = "none";
+        return;
+      }
+      if (this.position === this.carouselLength - 1)
         this.arrowRight.style.display = "none";
     },
   };
