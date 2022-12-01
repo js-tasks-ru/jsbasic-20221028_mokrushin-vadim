@@ -3,12 +3,9 @@ import createElement from "../../assets/lib/create-element.js";
 class Slide {
   constructor(product) {
     this.product = product;
-
-    const slide = document.createElement("DIV");
     const basePath = "/assets/images/carousel/";
-    slide.classList.add("carousel__slide");
 
-    slide.innerHTML = `
+    this.elem = createElement(`
     <div class="carousel__slide" data-id="${product.id}">
     <img src="${basePath}${product.image}" class="carousel__img" alt="slide">
       <div class="carousel__caption">
@@ -19,9 +16,7 @@ class Slide {
         </button>
       </div>
     </div>
-    `;
-
-    this.elem = slide;
+    `);
   }
 }
 
@@ -32,7 +27,7 @@ export default class Carousel {
         <div class="carousel__arrow carousel__arrow_right">
         <img src="/assets/images/icons/angle-icon.svg" alt="icon">
       </div>
-      <div class="carousel__arrow carousel__arrow_left">
+      <div class="carousel__arrow carousel__arrow_left" style="display: none"}>
         <img src="/assets/images/icons/angle-left-icon.svg" alt="icon">
       </div>
     </div>`);
@@ -43,13 +38,10 @@ export default class Carousel {
     });
 
     carousel.appendChild(inner);
+    this.init();
     this.elem = carousel;
 
     this.addEventListener();
-
-    document.addEventListener("product-add", (event) => {
-      console.log(event.detail);
-    });
   }
 
   addEventListener() {
@@ -72,15 +64,10 @@ export default class Carousel {
 
   init() {
     this.position = 0;
-    this.innerBox = document.querySelector(".carousel__inner");
-    this.arrowLeft = document.querySelector(".carousel__arrow_left");
-    this.arrowRight = document.querySelector(".carousel__arrow_right");
-
-    this.update();
   }
 
   get carouselLength() {
-    return this.innerBox.children.length;
+    return document.querySelector(".carousel__inner").children.length;
   }
 
   switchLeft() {
@@ -94,6 +81,10 @@ export default class Carousel {
   }
 
   update() {
+    this.innerBox = document.querySelector(".carousel__inner");
+    this.arrowLeft = document.querySelector(".carousel__arrow_left");
+    this.arrowRight = document.querySelector(".carousel__arrow_right");
+
     this.innerBox.style.transform = `translateX(-${
       this.position * this.innerBox.offsetWidth
     }px)`;

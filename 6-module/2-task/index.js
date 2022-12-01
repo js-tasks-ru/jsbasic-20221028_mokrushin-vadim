@@ -27,7 +27,7 @@ export default class ProductCard {
   }
 
   #onclick(event) {
-    if (event.target.closest("button")?.classList.contains("card__button")) {
+    if (event.target.closest(".card__button")) {
       event.currentTarget.dispatchEvent(
         new CustomEvent("product-add", {
           bubbles: true,
