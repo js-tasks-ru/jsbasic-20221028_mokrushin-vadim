@@ -26,33 +26,36 @@ export default class StepSlider {
   }
 
   initVariables() {
-    this.sliderThumb = this.elem.querySelector(".slider__thumb");
-    this.sliderProgress = this.elem.querySelector(".slider__progress");
-    this.sliderValue = this.elem.querySelector(".slider__value");
-    this.sliderSteps = this.elem.querySelector(".slider__steps");
+    this.thumb = this.elem.querySelector(".slider__thumb");
+    this.progressBar = this.elem.querySelector(".slider__progress");
+    this.valueField = this.elem.querySelector(".slider__value");
+    this.stepsBar = this.elem.querySelector(".slider__steps");
   }
 
   updateView() {
     const relativeValue = (this.value / (this.steps - 1)) * 100 + "%";
-    this.sliderThumb.style.left = relativeValue;
-    this.sliderProgress.style.width = relativeValue;
-    this.sliderValue.textContent = this.value;
-
-    const selectedSpan = this.elem.querySelector(".slider__step-active");
-    selectedSpan?.classList.remove("slider__step-active");
-    this.sliderSteps.children[this.value].classList.add("slider__step-active");
+    this.thumb.style.left = relativeValue;
+    this.progressBar.style.width = relativeValue;
+    this.valueField.textContent = this.value;
+    this.updateActiveSpan();
+    // console.log(this.progressBar.style.width);
   }
 
   updateDynamicView(x) {
-    this.sliderValue.textContent = this.value;
-    this.sliderProgress.style.width =
+    this.valueField.textContent = this.value;
+    this.progressBar.style.width =
       ((x - this.elem.getBoundingClientRect().left) /
         this.elem.getBoundingClientRect().width) *
         100 +
       "%";
+    this.updateActiveSpan();
+    console.log(this.progressBar.style.width);
+  }
+
+  updateActiveSpan() {
     const selectedSpan = this.elem.querySelector(".slider__step-active");
     selectedSpan?.classList.remove("slider__step-active");
-    this.sliderSteps.children[this.value].classList.add("slider__step-active");
+    this.stepsBar.children[this.value].classList.add("slider__step-active");
   }
 
   dispatchChangeEvent() {
@@ -64,8 +67,8 @@ export default class StepSlider {
     );
   }
 
-  setValue(x) {
-    const clickPoint = x - this.elem.getBoundingClientRect().left;
+  setValue(pageX) {
+    const clickPoint = pageX - this.elem.getBoundingClientRect().left;
     const scaleWidth = this.elem.getBoundingClientRect().width;
     const relativeScaleClickPoint = clickPoint / scaleWidth;
     const selectedValue = Math.round(
@@ -85,10 +88,10 @@ export default class StepSlider {
   }
 
   initEventListeners() {
-    this.sliderThumb.addEventListener("pointerdown", (event) => {
+    this.thumb.addEventListener("pointerdown", (event) => {
       const moveAt = (pageX) => {
-        thumb.style.left = pageX + "px";
-        thumb.style.top = initialY + thumb.offsetHeight / 2 + "px";
+        thumb.style.left = pageX - sliderShiftX + "px";
+        thumb.style.top = "50%";
       };
 
       const onMove = (event) => {
@@ -97,29 +100,26 @@ export default class StepSlider {
         this.updateDynamicView(event.pageX);
       };
 
-      const thumb = this.sliderThumb;
-      const initialY = thumb.getBoundingClientRect().top;
-      const shiftX = event.clientX - thumb.getBoundingClientRect().left;
-      const shiftY = event.clientY - thumb.getBoundingClientRect().top;
+      const thumb = this.thumb;
+      const sliderShiftX = this.elem.getBoundingClientRect().left;
+      // const shiftX = event.clientX - thumb.getBoundingClientRect().left;
+      // const shiftY = event.clientY - thumb.getBoundingClientRect().top;
 
       thumb.ondragstart = () => false;
-      thumb.style.position = "absoulute";
-      document.body.append(thumb);
       this.elem.classList.add("slider_dragging");
       moveAt(event.pageX);
 
-      document.addEventListener("mousemove", onMove);
-      thumb.onmouseup = () => {
-        document.removeEventListener("mousemove", onMove);
-        document.body.removeChild(thumb);
-        this.elem.classList.remove("slider_dragging");
-        thumb.style.top = "50%";
-        this.elem.appendChild(thumb);
-        this.updateView();
-        thumb.onmouseup = null;
+      this.elem.addEventListener("pointermove", onMove);
 
+      const pointerup = () => {
         this.dispatchChangeEvent();
+        this.updateView();
+        thumb.removeEventListener("pointerup", pointerup);
+        this.elem.removeEventListener("pointermove", onMove);
+        this.elem.classList.remove("slider_dragging");
       };
+
+      thumb.addEventListener("pointerup", pointerup);
     });
 
     this.elem.addEventListener("click", (event) => {
