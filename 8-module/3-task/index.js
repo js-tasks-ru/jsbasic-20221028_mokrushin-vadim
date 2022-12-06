@@ -32,7 +32,6 @@ export default class Cart {
       object.count += amount;
       object.count === 0 && this.cartItems.splice(similarProductIndex, 1);
     }
-    console.log(this.cartItems);
   }
 
   isEmpty() {

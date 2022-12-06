@@ -41,7 +41,6 @@ export default class Modal {
   open() {
     document.body.appendChild(this.elem);
     document.body.classList.add("is-modal-open");
-    console.log(document.body.children);
   }
 
   close() {
