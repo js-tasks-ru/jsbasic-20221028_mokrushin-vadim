@@ -81,11 +81,6 @@ export default class StepSlider {
 
     this.sub("thumb").style.left = `${newLeft * 100}%`;
     this.sub("progress").style.width = `${newLeft * 100}%`;
-
-    // Show the nearest value
-    // First half of step is 1, et
-    // |-------|-------|-------|-------|
-    // | 1 /   2   /   3   /   4   / 5 |
     this.value = Math.round(this.segments * newLeft);
     this.sub("value").innerHTML = this.value;
 
@@ -117,7 +112,6 @@ export default class StepSlider {
 
     this.elem.classList.remove("slider_dragging");
 
-    // stick to the final value
     this.sub("thumb").style.left = `${(this.value / this.segments) * 100}%`;
     this.sub("progress").style.width = `${(this.value / this.segments) * 100}%`;
 
